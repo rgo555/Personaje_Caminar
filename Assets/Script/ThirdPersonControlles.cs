@@ -14,6 +14,7 @@ public class ThirdPersonControlles : MonoBehaviour
 
     public float speed = 5; 
     public float jumpForce = 20;
+    public float jumpHeight =1;
     private float gravity = -12f;
     public bool isGrounded; 
 // -9.81f
@@ -24,24 +25,33 @@ public class ThirdPersonControlles : MonoBehaviour
 
     void Update()
     {
-        Vector3 move = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+        Vector3 move = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 
-        controller.Move(move * speed * Time.deltaTime);
+        if(move != Vector3.zero)
+        {
+            float targetAngle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
+
+            transform.rotation = Quaternion.Euler(0, targetAngle, 0);
+
+            controller.Move(move * speed * Time.deltaTime);
+        }
+
 
        // isGrounded = controller.isGrounded;
         isGrounded = Physics.CheckSphere(groundSensor.position, sensorRadius, ground);
         if(isGrounded && playerVelocity.y < 0)
-      {
+        {
         playerVelocity.y = 0;
-      }
+        }
 
-    if(Input.GetButtonDown("Jump") && isGrounded)
-    {
+        if(Input.GetButtonDown("Jump") && isGrounded)
+        {
 
-    playerVelocity.y += jumpForce;
+        //playerVelocity.y += jumpForce;
+        playerVelocity.y += Mathf.Sqrt(jumpHeight * -2.0f * gravity);
 
-    }
-    playerVelocity.y += gravity * Time.deltaTime;
-    controller.Move(playerVelocity* Time.deltaTime);
-    }
+        }
+        playerVelocity.y += gravity * Time.deltaTime;
+        controller.Move(playerVelocity* Time.deltaTime);
+        }
 }

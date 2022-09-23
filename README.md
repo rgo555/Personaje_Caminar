@@ -1,2 +1,0 @@
-# Personaje_Caminar
- 
